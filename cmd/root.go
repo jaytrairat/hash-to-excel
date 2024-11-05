@@ -150,7 +150,13 @@ func setColumnWidths(f *excelize.File) error {
 
 // setStyles applies the styles to the cells in the Excel file
 func setStyles(f *excelize.File, recordCount int) error {
+	// Style for the header row: bold, with "TH Sarabun New" at 16 pt
 	headerStyle, err := f.NewStyle(&excelize.Style{
+		Font: &excelize.Font{
+			Bold:   true,
+			Size:   16,
+			Family: "TH Sarabun New",
+		},
 		Alignment: &excelize.Alignment{
 			Horizontal: "center",
 			Vertical:   "center",
@@ -161,7 +167,23 @@ func setStyles(f *excelize.File, recordCount int) error {
 	}
 	f.SetCellStyle("Sheet1", "A1", "D1", headerStyle)
 
+	// Style for content cells with "TH Sarabun New" at 16 pt
+	contentStyle, err := f.NewStyle(&excelize.Style{
+		Font: &excelize.Font{
+			Size:   16,
+			Family: "TH Sarabun New",
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("error creating content style: %w", err)
+	}
+
+	// Center-aligned style for columns A and B with "TH Sarabun New" at 16 pt
 	centerStyle, err := f.NewStyle(&excelize.Style{
+		Font: &excelize.Font{
+			Size:   16,
+			Family: "TH Sarabun New",
+		},
 		Alignment: &excelize.Alignment{
 			Horizontal: "center",
 		},
@@ -170,7 +192,12 @@ func setStyles(f *excelize.File, recordCount int) error {
 		return fmt.Errorf("error creating center style: %w", err)
 	}
 
+	// Right-aligned style for column D with "TH Sarabun New" at 16 pt
 	rightStyle, err := f.NewStyle(&excelize.Style{
+		Font: &excelize.Font{
+			Size:   16,
+			Family: "TH Sarabun New",
+		},
 		Alignment: &excelize.Alignment{
 			Horizontal: "right",
 		},
@@ -179,8 +206,10 @@ func setStyles(f *excelize.File, recordCount int) error {
 		return fmt.Errorf("error creating right style: %w", err)
 	}
 
+	// Apply styles to each row in the data
 	for i := startDataRow; i <= recordCount+1; i++ {
 		f.SetCellStyle("Sheet1", fmt.Sprintf("A%d", i), fmt.Sprintf("A%d", i), centerStyle)
+		f.SetCellStyle("Sheet1", fmt.Sprintf("B%d", i), fmt.Sprintf("C%d", i), contentStyle)
 		f.SetCellStyle("Sheet1", fmt.Sprintf("D%d", i), fmt.Sprintf("D%d", i), rightStyle)
 	}
 
