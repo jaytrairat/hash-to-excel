@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/jaytrairat/hash-to-excel/cmd/cfuncs"
 	"github.com/spf13/cobra"
 	"github.com/xuri/excelize/v2"
 )
@@ -19,6 +20,7 @@ const (
 	fileNameIndex  = 0
 	hashIndex      = 1
 	fileSizeIndex  = 11
+	startDataRow   = 2
 )
 
 var headers = []string{"ลำดับ", "File name", "SHA-256", "File size"}
@@ -34,18 +36,10 @@ var rootCmd = &cobra.Command{
 	Use:   "hash-to-excel",
 	Short: "Read a CSV file and write specific fields to a new Excel file",
 	Run: func(cmd *cobra.Command, args []string) {
-		inputFile, err := cmd.Flags().GetString("input")
-		if err != nil {
-			fmt.Println("Error retrieving input flag:", err)
-			return
-		}
+		inputFile, _ := cmd.Flags().GetString("input")
 
 		if inputFile == "" {
-			inputFile, err = findFirstCSVFile()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
+			inputFile, _ = findFirstCSVFile()
 		}
 
 		if err := parseFile(inputFile); err != nil {
@@ -61,14 +55,9 @@ func init() {
 }
 
 func parseFile(inputFilename string) error {
-	records, err := readCSV(inputFilename)
-	if err != nil {
-		return err
-	}
-
+	records, _ := readCSV(inputFilename)
 	if len(records) == 0 {
 		fmt.Println("No records found in the input CSV file.")
-		return nil
 	}
 
 	f := excelize.NewFile()
@@ -128,7 +117,7 @@ func createExcelFile(f *excelize.File, records [][]string) error {
 		return err
 	}
 
-	if err := cfuncs.setStyles(f, len(records)); err != nil {
+	if err := cfuncs.SetStyles(f, len(records)); err != nil {
 		return err
 	}
 

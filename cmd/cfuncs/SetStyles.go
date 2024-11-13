@@ -10,7 +10,7 @@ const (
 	startDataRow = 2
 )
 
-func setStyles(f *excelize.File, recordCount int) error {
+func SetStyles(f *excelize.File, recordCount int) error {
 	headerStyle, err := f.NewStyle(&excelize.Style{
 		Font: &excelize.Font{
 			Bold:   true,
@@ -33,7 +33,7 @@ func setStyles(f *excelize.File, recordCount int) error {
 	}
 	f.SetCellStyle("Sheet1", "A1", "D1", headerStyle)
 
-	indexStyle, err := f.NewStyle(&excelize.Style{
+	indexStyle, _ := f.NewStyle(&excelize.Style{
 		Font: &excelize.Font{
 			Size:   16,
 			Family: "TH Sarabun New",
@@ -49,17 +49,15 @@ func setStyles(f *excelize.File, recordCount int) error {
 			{Type: "bottom", Color: "000000", Style: 1},
 		},
 	})
-	if err != nil {
-		return fmt.Errorf("error creating index style: %w", err)
-	}
 
-	contentStyle, err := f.NewStyle(&excelize.Style{
+	contentStyle, _ := f.NewStyle(&excelize.Style{
 		Font: &excelize.Font{
 			Size:   16,
 			Family: "TH Sarabun New",
 		},
 		Alignment: &excelize.Alignment{
 			WrapText: true,
+			Vertical: "center",
 		},
 		Border: []excelize.Border{
 			{Type: "left", Color: "000000", Style: 1},
@@ -68,11 +66,8 @@ func setStyles(f *excelize.File, recordCount int) error {
 			{Type: "bottom", Color: "000000", Style: 1},
 		},
 	})
-	if err != nil {
-		return fmt.Errorf("error creating content style: %w", err)
-	}
 
-	rightAlignedStyle, err := f.NewStyle(&excelize.Style{
+	rightAlignedStyle, _ := f.NewStyle(&excelize.Style{
 		Font: &excelize.Font{
 			Size:   16,
 			Family: "TH Sarabun New",
@@ -88,9 +83,6 @@ func setStyles(f *excelize.File, recordCount int) error {
 			{Type: "bottom", Color: "000000", Style: 1},
 		},
 	})
-	if err != nil {
-		return fmt.Errorf("error creating right-aligned style: %w", err)
-	}
 
 	for i := startDataRow; i <= recordCount+1; i++ {
 		f.SetCellStyle("Sheet1", fmt.Sprintf("A%d", i), fmt.Sprintf("A%d", i), indexStyle)
