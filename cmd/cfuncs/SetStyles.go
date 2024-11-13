@@ -11,10 +11,10 @@ const (
 )
 
 var columnWidths = map[string]float64{
-	"A": 7,
-	"B": 40,
-	"C": 75,
-	"D": 15,
+	"A": 6,
+	"B": 21,
+	"C": 38,
+	"D": 10,
 }
 
 func SetColumnWidths(f *excelize.File) error {

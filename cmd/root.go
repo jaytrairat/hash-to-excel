@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/jaytrairat/hash-to-excel/cmd/cfuncs"
 	"github.com/spf13/cobra"
@@ -95,15 +96,15 @@ func createExcelFile(f *excelize.File, records [][]string) error {
 	f.SetSheetRow("Sheet1", "A1", &headers)
 
 	for i, record := range records {
-		if len(record) >= 12 {
-			halfLengthOfHash := len(record[hashIndex]) / 2
-			splitedHash := record[hashIndex][:halfLengthOfHash] + "\r\n" + record[hashIndex][halfLengthOfHash:]
 
-			newRecord := []interface{}{i + 1, record[fileNameIndex], splitedHash, record[fileSizeIndex]}
-			f.SetSheetRow("Sheet1", fmt.Sprintf("A%d", i+startDataRow), &newRecord)
-		} else {
-			fmt.Println("Skipping record due to insufficient fields:", record)
-		}
+		splitedFileNameField := strings.Split(record[fileNameIndex], "_")
+		formattedFileNameField := strings.Join(splitedFileNameField[0:3], "_") + "_\n" + strings.Join(splitedFileNameField[3:], "_")
+
+		halfLengthOfHashField := len(record[hashIndex]) / 2
+		splitedHashField := record[hashIndex][:halfLengthOfHashField] + "\r\n" + record[hashIndex][halfLengthOfHashField:]
+
+		columnData := []interface{}{i + 1, formattedFileNameField, splitedHashField, record[fileSizeIndex]}
+		f.SetSheetRow("Sheet1", fmt.Sprintf("A%d", i+startDataRow), &columnData)
 	}
 
 	cfuncs.SetColumnWidths(f)
