@@ -25,13 +25,6 @@ const (
 
 var headers = []string{"ลำดับ", "File name", "SHA-256", "File size"}
 
-var columnWidths = map[string]float64{
-	"A": 7,
-	"B": 40,
-	"C": 75,
-	"D": 15,
-}
-
 var rootCmd = &cobra.Command{
 	Use:   "hash-to-excel",
 	Short: "Read a CSV file and write specific fields to a new Excel file",
@@ -113,23 +106,8 @@ func createExcelFile(f *excelize.File, records [][]string) error {
 		}
 	}
 
-	if err := setColumnWidths(f); err != nil {
-		return err
-	}
-
-	if err := cfuncs.SetStyles(f, len(records)); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func setColumnWidths(f *excelize.File) error {
-	for col, width := range columnWidths {
-		if err := f.SetColWidth("Sheet1", col, col, width); err != nil {
-			return fmt.Errorf("error setting column width: %w", err)
-		}
-	}
+	cfuncs.SetColumnWidths(f)
+	cfuncs.SetStyles(f, len(records))
 	return nil
 }
 

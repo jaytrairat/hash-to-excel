@@ -10,8 +10,24 @@ const (
 	startDataRow = 2
 )
 
+var columnWidths = map[string]float64{
+	"A": 7,
+	"B": 40,
+	"C": 75,
+	"D": 15,
+}
+
+func SetColumnWidths(f *excelize.File) error {
+	for col, width := range columnWidths {
+		if err := f.SetColWidth("Sheet1", col, col, width); err != nil {
+			return fmt.Errorf("error setting column width: %w", err)
+		}
+	}
+	return nil
+}
+
 func SetStyles(f *excelize.File, recordCount int) error {
-	headerStyle, err := f.NewStyle(&excelize.Style{
+	headerStyle, _ := f.NewStyle(&excelize.Style{
 		Font: &excelize.Font{
 			Bold:   true,
 			Size:   16,
@@ -28,9 +44,6 @@ func SetStyles(f *excelize.File, recordCount int) error {
 			{Type: "bottom", Color: "000000", Style: 1},
 		},
 	})
-	if err != nil {
-		return fmt.Errorf("error creating header style: %w", err)
-	}
 	f.SetCellStyle("Sheet1", "A1", "D1", headerStyle)
 
 	indexStyle, _ := f.NewStyle(&excelize.Style{
