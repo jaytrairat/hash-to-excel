@@ -16,12 +16,13 @@ import (
 )
 
 const (
-	outputFileName = "formatted_hash.xlsx"
-	headerRow      = 1
-	fileNameIndex  = 0
-	hashIndex      = 1
-	fileSizeIndex  = 11
-	startDataRow   = 2
+	outputExcelFileName = "formatted_hash.xlsx"
+	outputTextFileName  = "formatted_hash.txt"
+	headerRow           = 1
+	fileNameIndex       = 0
+	hashIndex           = 1
+	fileSizeIndex       = 11
+	startDataRow        = 2
 )
 
 var headers = []string{"ลำดับ", "File name", "SHA-256", "File size"}
@@ -39,7 +40,7 @@ var rootCmd = &cobra.Command{
 		if err := parseFile(inputFile); err != nil {
 			fmt.Println("Failed to process files:", err)
 		} else {
-			fmt.Printf("Successfully processed the CSV file (%s) and created %s", inputFile, outputFileName)
+			fmt.Printf("Successfully processed the CSV file (%s) and created %s", inputFile, outputExcelFileName)
 		}
 	},
 }
@@ -59,6 +60,9 @@ func parseFile(inputFilename string) error {
 		return err
 	}
 
+	if err := createTextFile(records); err != nil {
+		return err
+	}
 	return saveExcelFile(f)
 }
 
@@ -112,8 +116,30 @@ func createExcelFile(f *excelize.File, records [][]string) error {
 	return nil
 }
 
+func createTextFile(records [][]string) error {
+	var formatted []string
+	for _, record := range records {
+		fileNameField := record[fileNameIndex]
+		hashFile := record[hashIndex]
+		formatted = append(formatted, fmt.Sprintf(
+			"รายละเอียดปรากฏตามไฟล์ประกอบรายงาน ชื่อไฟล์ %s ค่า Hash SHA256: %s",
+			fileNameField,
+			hashFile,
+		))
+	}
+
+	content := strings.Join(formatted, "\n")
+
+	err := os.WriteFile(outputTextFileName, []byte(content), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write to file %s: %w", outputTextFileName, err)
+	}
+
+	return nil
+}
+
 func saveExcelFile(f *excelize.File) error {
-	return f.SaveAs(outputFileName)
+	return f.SaveAs(outputExcelFileName)
 }
 
 func Execute() {
